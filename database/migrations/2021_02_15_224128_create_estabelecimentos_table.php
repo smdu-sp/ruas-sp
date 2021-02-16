@@ -20,6 +20,8 @@ class CreateEstabelecimentosTable extends Migration
             $table->string('celular');
             
             $table->string('endereco');
+            $table->string('numero');
+            $table->string('complemento');
             $table->string('cep');
             $table->string('coords_xy');
             $table->string('sql');

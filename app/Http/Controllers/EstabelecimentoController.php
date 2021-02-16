@@ -41,6 +41,7 @@ class EstabelecimentoController extends Controller
             'email' => $request->input('email'),
             'celular' => $request->input('celular'),
             'endereco' => $request->input('endereco'),
+            'numero' => $request->input('numero'),
             'cep' => $request->input('cep'),
             'coords_xy' => $request->input('coords_xy'),
             'sql' => $request->input('sql'),
