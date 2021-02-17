@@ -3,10 +3,8 @@
 </template>
 <script>
 export default {
-    data() {
-        return {
-
-        }
+    mounted() {
+        this.$router.push('pre-cadastro')
     }
 }
 </script>

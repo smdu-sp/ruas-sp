@@ -1852,6 +1852,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
 
 /***/ }),
@@ -1965,8 +1968,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  data: function data() {
-    return {};
+  mounted: function mounted() {
+    this.$router.push('pre-cadastro');
   }
 });
 
@@ -37909,11 +37912,31 @@ var render = function() {
   return _c(
     "div",
     { staticClass: "container" },
-    [_c("h1", [_vm._v("Projeto Ruas SP")]), _vm._v(" "), _c("router-view")],
+    [_vm._m(0), _vm._v(" "), _c("router-view")],
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("img", {
+        attrs: {
+          src: "/img/smul_logo_azul.png",
+          alt: "SMUL",
+          width: "248",
+          height: "176"
+        }
+      }),
+      _vm._v(" "),
+      _c("h1", { staticStyle: { "line-height": "3" } }, [
+        _vm._v("Projeto Ruas SP")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
