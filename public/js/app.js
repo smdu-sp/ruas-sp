@@ -1986,6 +1986,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var vue_the_mask__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-the-mask */ "./node_modules/vue-the-mask/dist/vue-the-mask.js");
+/* harmony import */ var vue_the_mask__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_the_mask__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -2070,6 +2072,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2083,10 +2086,17 @@ __webpack_require__.r(__webpack_exports__);
         endereco: 'Por favor, preencha o endereço completo.',
         numero: 'Preencha o número',
         razao_social: 'Preencha a razão social.',
+        cep: 'CEP inválido',
         cnpj: 'CNPJ inválido.',
         licenca: 'Por favor, preencha a licença de funcionamento.'
-      }
+      },
+      cep_api: 'api/cep/',
+      cnpj_api: 'api/cnpj/',
+      waitingCep: false
     };
+  },
+  components: {
+    TheMask: vue_the_mask__WEBPACK_IMPORTED_MODULE_0__.TheMask
   },
   methods: {
     checkForm: function checkForm(e) {
@@ -2094,7 +2104,6 @@ __webpack_require__.r(__webpack_exports__);
         e.preventDefault();
       }
 
-      var item = this.estabelecimento;
       var forms = document.querySelectorAll('.needs-validation');
       Array.prototype.slice.call(forms).forEach(function (form) {
         if (!form.checkValidity()) {
@@ -2103,26 +2112,20 @@ __webpack_require__.r(__webpack_exports__);
         }
 
         form.classList.add('was-validated');
-      }, false); // if(!valNome())
-      //     this.errors.push(this.valErrors.nome)
-      // if(!valEmail())
-      //     this.errors.push(this.valErrors.email)
-      // if(!valCelular())
-      //     this.errors.push(this.valErrors.celular)
-      // if(!valEndereco())
-      //     this.errors.push(this.valErrors.endereco)
-      // if(!valRazaoSocial())
-      //     this.errors.push(this.valErrors.razao_social)
-      // if(!valCnpj())
-      //     this.errors.push(this.valErrors.cnpj)
-      // if(!valLicenca())
-      //     this.errors.push(this.valErrors.licenca)
-
+      }, false);
       if (!this.errors.length) this.sendForm();else document.querySelector('#formulario').focus();
     },
-    sendForm: function sendForm() {// Prepara objeto Estabelecimento e envia para o servidor
+    sendForm: function sendForm() {
+      // Prepara objeto Estabelecimento e envia para o servidor
+      axios.post('api/estabelecimento/store', this.estabelecimento).then(function (response) {
+        console.log(response.data);
+        console.warn(response);
+      })["catch"](function (err) {
+        return console.error(err);
+      });
     },
     valEmail: function valEmail() {
+      // Valida e-mail 
       var mail = this.estabelecimento.email;
       var mailField = document.querySelector('#email');
       var mailConfirmField = document.querySelector('#email-confirm');
@@ -2135,17 +2138,72 @@ __webpack_require__.r(__webpack_exports__);
       if (mail !== this.estabelecimento.email_confirm) {
         mailConfirmField.classList.remove('is-valid');
         mailConfirmField.classList.add('is-invalid');
-        console.error("EMAIL ERRADO");
         return false;
       }
 
       mailConfirmField.classList.remove('is-invalid');
       mailConfirmField.classList.add('is-valid');
-      console.log("Email bate");
     },
-    conlog: function conlog(el) {
-      console.log(el);
-      el.target.classList.remove('is-invalid');
+    getCepAddress: function getCepAddress() {
+      var _this = this;
+
+      var cepUrl = this.cep_api + this.cleanNumber(this.estabelecimento.cep);
+      this.waitingCep = true;
+      window.setTimeout(function () {
+        if (_this.waitingCep) {
+          document.querySelector('#cep').classList.remove('is-invalid');
+          document.querySelector('#endereco').removeAttribute('disabled');
+          console.log("Falha ao obter dados do CEP");
+        } else console.log("Cep obtido");
+      }, 3000);
+      axios.get(cepUrl).then(function (response) {
+        _this.waitingCep = false;
+
+        if (response.data.erro) {
+          document.querySelector('#cep').classList.add('is-invalid');
+          return;
+        }
+
+        var endereco = response.data.logradouro + " - " + response.data.bairro;
+        document.querySelector('#cep').classList.remove('is-invalid');
+        Vue.set(_this.estabelecimento, 'endereco', endereco);
+      })["catch"](function (err) {
+        return document.querySelector('#endereco').removeAttribute('disabled');
+      });
+    },
+    cleanNumber: function cleanNumber(dirtyNumber) {
+      if (!dirtyNumber) return;
+      if (!dirtyNumber.length > 0) throw "Número inválido";
+      var clean = dirtyNumber.match(/\d+/g).join('');
+      return clean;
+    },
+    checkCnpj: function checkCnpj() {
+      var _this2 = this;
+
+      if (this.estabelecimento.cnpj && this.estabelecimento.cnpj.length === 18) {
+        var cnpjUrl = this.cnpj_api + this.cleanNumber(this.estabelecimento.cnpj);
+        axios.get(cnpjUrl).then(function (response) {
+          if (response.data.status === "ERROR") {
+            document.querySelector('#cnpj').classList.add('is-invalid');
+            console.log(response.data.message);
+            return;
+          } // Atualiza CEP e busca endereço a partir dele
+
+
+          Vue.set(_this2.estabelecimento, 'cep', response.data.cep);
+          Vue.set(_this2.estabelecimento, 'razao_social', response.data.nome);
+          Vue.set(_this2.estabelecimento, 'email', response.data.email);
+
+          _this2.getCepAddress();
+
+          Vue.set(_this2.estabelecimento, 'numero', response.data.numero);
+          document.querySelector('#licenca').focus();
+        })["catch"](function (err) {
+          console.error("Não foi possível consultar CNPJ");
+          document.querySelector('#cnpj').classList.remove('is-invalid');
+          document.querySelector('#razao_social').removeAttribute('disabled');
+        });
+      }
     }
   }
 });
@@ -2162,9 +2220,11 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-axios */ "./node_modules/vue-axios/dist/vue-axios.es5.js");
 /* harmony import */ var vue_axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
 /* harmony import */ var _App_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./App.vue */ "./resources/js/App.vue");
-/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./routes */ "./resources/js/routes.js");
+/* harmony import */ var vue_the_mask__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-the-mask */ "./node_modules/vue-the-mask/dist/vue-the-mask.js");
+/* harmony import */ var vue_the_mask__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vue_the_mask__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./routes */ "./resources/js/routes.js");
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js").default;
@@ -2172,11 +2232,13 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js"
 
 
 
-Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_3__.default);
+
+Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_4__.default);
 Vue.use((vue_axios__WEBPACK_IMPORTED_MODULE_0___default()), axios);
-var router = new vue_router__WEBPACK_IMPORTED_MODULE_3__.default({
+Vue.use((vue_the_mask__WEBPACK_IMPORTED_MODULE_2___default()));
+var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__.default({
   mode: 'history',
-  routes: _routes__WEBPACK_IMPORTED_MODULE_2__.routes
+  routes: _routes__WEBPACK_IMPORTED_MODULE_3__.routes
 }); // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
 var app = new Vue({
@@ -38150,6 +38212,132 @@ var render = function() {
           _vm._v(" "),
           _c("div", { staticClass: "card-body" }, [
             _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col-md-4" }, [
+                _c(
+                  "label",
+                  { staticClass: "form-label", attrs: { for: "cnpj" } },
+                  [_vm._v("CNPJ")]
+                ),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.estabelecimento.cnpj,
+                      expression: "estabelecimento.cnpj"
+                    },
+                    {
+                      name: "mask",
+                      rawName: "v-mask",
+                      value: "##.###.###/####-##",
+                      expression: "'##.###.###/####-##'"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "tel", id: "cnpj", required: "" },
+                  domProps: { value: _vm.estabelecimento.cnpj },
+                  on: {
+                    change: _vm.checkCnpj,
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.estabelecimento, "cnpj", $event.target.value)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "invalid-feedback" }, [
+                  _vm._v(_vm._s(_vm.valErrors.cnpj))
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-4" }, [
+                _c(
+                  "label",
+                  { staticClass: "form-label", attrs: { for: "razao_social" } },
+                  [_vm._v("Razão Social")]
+                ),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.estabelecimento.razao_social,
+                      expression: "estabelecimento.razao_social"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    id: "razao_social",
+                    required: "",
+                    disabled: ""
+                  },
+                  domProps: { value: _vm.estabelecimento.razao_social },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.estabelecimento,
+                        "razao_social",
+                        $event.target.value
+                      )
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "invalid-feedback" }, [
+                  _vm._v(_vm._s(_vm.valErrors.razao_social))
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-4" }, [
+                _c(
+                  "label",
+                  { staticClass: "form-label", attrs: { for: "licenca" } },
+                  [_vm._v("Licença de funcionamento")]
+                ),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.estabelecimento.licenca,
+                      expression: "estabelecimento.licenca"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", id: "licenca", required: "" },
+                  domProps: { value: _vm.estabelecimento.licenca },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.estabelecimento,
+                        "licenca",
+                        $event.target.value
+                      )
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "invalid-feedback" }, [
+                  _vm._v(_vm._s(_vm.valErrors.licenca))
+                ])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("br"),
+            _vm._v(" "),
+            _c("div", { staticClass: "row" }, [
               _c("div", { staticClass: "col-md-2" }, [
                 _c(
                   "label",
@@ -38164,10 +38352,16 @@ var render = function() {
                       rawName: "v-model",
                       value: _vm.estabelecimento.cep,
                       expression: "estabelecimento.cep"
+                    },
+                    {
+                      name: "mask",
+                      rawName: "v-mask",
+                      value: "#####-###",
+                      expression: "'#####-###'"
                     }
                   ],
                   staticClass: "form-control",
-                  attrs: { type: "number", id: "cep", required: "" },
+                  attrs: { type: "tel", id: "cep", required: "" },
                   domProps: { value: _vm.estabelecimento.cep },
                   on: {
                     blur: _vm.getCepAddress,
@@ -38202,7 +38396,12 @@ var render = function() {
                     }
                   ],
                   staticClass: "form-control",
-                  attrs: { type: "text", id: "endereco", required: "" },
+                  attrs: {
+                    type: "text",
+                    id: "endereco",
+                    disabled: "",
+                    required: ""
+                  },
                   domProps: { value: _vm.estabelecimento.endereco },
                   on: {
                     input: function($event) {
@@ -38237,10 +38436,16 @@ var render = function() {
                       rawName: "v-model",
                       value: _vm.estabelecimento.numero,
                       expression: "estabelecimento.numero"
+                    },
+                    {
+                      name: "mask",
+                      rawName: "v-mask",
+                      value: "#######",
+                      expression: "'#######'"
                     }
                   ],
                   staticClass: "form-control",
-                  attrs: { type: "text", id: "numero", required: "" },
+                  attrs: { type: "tel", id: "numero", required: "" },
                   domProps: { value: _vm.estabelecimento.numero },
                   on: {
                     input: function($event) {
@@ -38309,13 +38514,19 @@ var render = function() {
                       rawName: "v-model",
                       value: _vm.estabelecimento.sql,
                       expression: "estabelecimento.sql"
+                    },
+                    {
+                      name: "mask",
+                      rawName: "v-mask",
+                      value: ["###.###.####", "###.###.####-#"],
+                      expression: "['###.###.####','###.###.####-#']"
                     }
                   ],
                   staticClass: "form-control",
                   attrs: {
                     type: "text",
                     id: "sql",
-                    title: "SQL (Setor, Quadra, Lote)"
+                    title: "Cadastro do imóvel ou SQL (Setor, Quadra, Lote)"
                   },
                   domProps: { value: _vm.estabelecimento.sql },
                   on: {
@@ -38327,120 +38538,6 @@ var render = function() {
                     }
                   }
                 })
-              ])
-            ]),
-            _vm._v(" "),
-            _c("br"),
-            _vm._v(" "),
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col-md-4" }, [
-                _c(
-                  "label",
-                  { staticClass: "form-label", attrs: { for: "razao_social" } },
-                  [_vm._v("Razão Social")]
-                ),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.estabelecimento.razao_social,
-                      expression: "estabelecimento.razao_social"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: { type: "text", id: "razao_social", required: "" },
-                  domProps: { value: _vm.estabelecimento.razao_social },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(
-                        _vm.estabelecimento,
-                        "razao_social",
-                        $event.target.value
-                      )
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", { staticClass: "invalid-feedback" }, [
-                  _vm._v(_vm._s(_vm.valErrors.razao_social))
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-md-4" }, [
-                _c(
-                  "label",
-                  { staticClass: "form-label", attrs: { for: "cnpj" } },
-                  [_vm._v("CNPJ")]
-                ),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.estabelecimento.cnpj,
-                      expression: "estabelecimento.cnpj"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: { type: "text", id: "cnpj", required: "" },
-                  domProps: { value: _vm.estabelecimento.cnpj },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(_vm.estabelecimento, "cnpj", $event.target.value)
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", { staticClass: "invalid-feedback" }, [
-                  _vm._v(_vm._s(_vm.valErrors.cnpj))
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-md-4" }, [
-                _c(
-                  "label",
-                  { staticClass: "form-label", attrs: { for: "licenca" } },
-                  [_vm._v("Licença de funcionamento")]
-                ),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.estabelecimento.licenca,
-                      expression: "estabelecimento.licenca"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: { type: "text", id: "cnpj", required: "" },
-                  domProps: { value: _vm.estabelecimento.licenca },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(
-                        _vm.estabelecimento,
-                        "licenca",
-                        $event.target.value
-                      )
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", { staticClass: "invalid-feedback" }, [
-                  _vm._v(_vm._s(_vm.valErrors.licenca))
-                ])
               ])
             ])
           ])
@@ -38506,9 +38603,6 @@ var render = function() {
                 attrs: { type: "email", id: "email", required: "" },
                 domProps: { value: _vm.estabelecimento.email },
                 on: {
-                  focus: function($event) {
-                    return _vm.conlog($event)
-                  },
                   input: function($event) {
                     if ($event.target.composing) {
                       return
@@ -38540,7 +38634,11 @@ var render = function() {
                   }
                 ],
                 staticClass: "form-control",
-                attrs: { type: "email", id: "email-confirm", required: "" },
+                attrs: {
+                  type: "email-confirm",
+                  id: "email-confirm",
+                  required: ""
+                },
                 domProps: { value: _vm.estabelecimento.email_confirm },
                 on: {
                   blur: _vm.valEmail,
@@ -38576,10 +38674,21 @@ var render = function() {
                     rawName: "v-model",
                     value: _vm.estabelecimento.celular,
                     expression: "estabelecimento.celular"
+                  },
+                  {
+                    name: "mask",
+                    rawName: "v-mask",
+                    value: ["(##) ##### ####", "(##) #### ####"],
+                    expression: "['(##) ##### ####', '(##) #### ####']"
                   }
                 ],
                 staticClass: "form-control",
-                attrs: { type: "text", id: "celular", required: "" },
+                attrs: {
+                  type: "tel",
+                  id: "celular",
+                  placeholder: "11 99999 9999",
+                  required: ""
+                },
                 domProps: { value: _vm.estabelecimento.celular },
                 on: {
                   input: function($event) {
@@ -41892,6 +42001,16 @@ if (inBrowser && window.Vue) {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (VueRouter);
 
+
+/***/ }),
+
+/***/ "./node_modules/vue-the-mask/dist/vue-the-mask.js":
+/*!********************************************************!*\
+  !*** ./node_modules/vue-the-mask/dist/vue-the-mask.js ***!
+  \********************************************************/
+/***/ (function(module) {
+
+(function(e,t){ true?module.exports=t():0})(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var a=n[r]={i:r,l:!1,exports:{}};return e[r].call(a.exports,a,a.exports,t),a.l=!0,a.exports}var n={};return t.m=e,t.c=n,t.i=function(e){return e},t.d=function(e,n,r){t.o(e,n)||Object.defineProperty(e,n,{configurable:!1,enumerable:!0,get:r})},t.n=function(e){var n=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(n,"a",n),n},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p=".",t(t.s=10)}([function(e,t){e.exports={"#":{pattern:/\d/},X:{pattern:/[0-9a-zA-Z]/},S:{pattern:/[a-zA-Z]/},A:{pattern:/[a-zA-Z]/,transform:function(e){return e.toLocaleUpperCase()}},a:{pattern:/[a-zA-Z]/,transform:function(e){return e.toLocaleLowerCase()}},"!":{escape:!0}}},function(e,t,n){"use strict";function r(e){var t=document.createEvent("Event");return t.initEvent(e,!0,!0),t}var a=n(2),o=n(0),i=n.n(o);t.a=function(e,t){var o=t.value;if((Array.isArray(o)||"string"==typeof o)&&(o={mask:o,tokens:i.a}),"INPUT"!==e.tagName.toLocaleUpperCase()){var u=e.getElementsByTagName("input");if(1!==u.length)throw new Error("v-mask directive requires 1 input, found "+u.length);e=u[0]}e.oninput=function(t){if(t.isTrusted){var i=e.selectionEnd,u=e.value[i-1];for(e.value=n.i(a.a)(e.value,o.mask,!0,o.tokens);i<e.value.length&&e.value.charAt(i-1)!==u;)i++;e===document.activeElement&&(e.setSelectionRange(i,i),setTimeout(function(){e.setSelectionRange(i,i)},0)),e.dispatchEvent(r("input"))}};var s=n.i(a.a)(e.value,o.mask,!0,o.tokens);s!==e.value&&(e.value=s,e.dispatchEvent(r("input")))}},function(e,t,n){"use strict";var r=n(6),a=n(5);t.a=function(e,t){var o=!(arguments.length>2&&void 0!==arguments[2])||arguments[2],i=arguments[3];return Array.isArray(t)?n.i(a.a)(r.a,t,i)(e,t,o,i):n.i(r.a)(e,t,o,i)}},function(e,t,n){"use strict";function r(e){e.component(s.a.name,s.a),e.directive("mask",i.a)}Object.defineProperty(t,"__esModule",{value:!0});var a=n(0),o=n.n(a),i=n(1),u=n(7),s=n.n(u);n.d(t,"TheMask",function(){return s.a}),n.d(t,"mask",function(){return i.a}),n.d(t,"tokens",function(){return o.a}),n.d(t,"version",function(){return c});var c="0.11.1";t.default=r,"undefined"!=typeof window&&window.Vue&&window.Vue.use(r)},function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var r=n(1),a=n(0),o=n.n(a),i=n(2);t.default={name:"TheMask",props:{value:[String,Number],mask:{type:[String,Array],required:!0},masked:{type:Boolean,default:!1},tokens:{type:Object,default:function(){return o.a}}},directives:{mask:r.a},data:function(){return{lastValue:null,display:this.value}},watch:{value:function(e){e!==this.lastValue&&(this.display=e)},masked:function(){this.refresh(this.display)}},computed:{config:function(){return{mask:this.mask,tokens:this.tokens,masked:this.masked}}},methods:{onInput:function(e){e.isTrusted||this.refresh(e.target.value)},refresh:function(e){this.display=e;var e=n.i(i.a)(e,this.mask,this.masked,this.tokens);e!==this.lastValue&&(this.lastValue=e,this.$emit("input",e))}}}},function(e,t,n){"use strict";function r(e,t,n){return t=t.sort(function(e,t){return e.length-t.length}),function(r,a){for(var o=!(arguments.length>2&&void 0!==arguments[2])||arguments[2],i=0;i<t.length;){var u=t[i];i++;var s=t[i];if(!(s&&e(r,s,!0,n).length>u.length))return e(r,u,o,n)}return""}}t.a=r},function(e,t,n){"use strict";function r(e,t){var n=!(arguments.length>2&&void 0!==arguments[2])||arguments[2],r=arguments[3];e=e||"",t=t||"";for(var a=0,o=0,i="";a<t.length&&o<e.length;){var u=t[a],s=r[u],c=e[o];s&&!s.escape?(s.pattern.test(c)&&(i+=s.transform?s.transform(c):c,a++),o++):(s&&s.escape&&(a++,u=t[a]),n&&(i+=u),c===u&&o++,a++)}for(var f="";a<t.length&&n;){var u=t[a];if(r[u]){f="";break}f+=u,a++}return i+f}t.a=r},function(e,t,n){var r=n(8)(n(4),n(9),null,null);e.exports=r.exports},function(e,t){e.exports=function(e,t,n,r){var a,o=e=e||{},i=typeof e.default;"object"!==i&&"function"!==i||(a=e,o=e.default);var u="function"==typeof o?o.options:o;if(t&&(u.render=t.render,u.staticRenderFns=t.staticRenderFns),n&&(u._scopeId=n),r){var s=u.computed||(u.computed={});Object.keys(r).forEach(function(e){var t=r[e];s[e]=function(){return t}})}return{esModule:a,exports:o,options:u}}},function(e,t){e.exports={render:function(){var e=this,t=e.$createElement;return(e._self._c||t)("input",{directives:[{name:"mask",rawName:"v-mask",value:e.config,expression:"config"}],attrs:{type:"text"},domProps:{value:e.display},on:{input:e.onInput}})},staticRenderFns:[]}},function(e,t,n){e.exports=n(3)}])});
 
 /***/ }),
 

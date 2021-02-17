@@ -10,7 +10,7 @@
         "production": "mix --production"
     },
     "devDependencies": {
-        "axios": "^0.21",
+        "axios": "^0.21.1",
         "bootstrap": "^4.0.0",
         "browser-sync": "^2.26.14",
         "browser-sync-webpack-plugin": "^2.3.0",
@@ -28,6 +28,7 @@
     },
     "dependencies": {
         "vue-axios": "^3.2.4",
-        "vue-router": "^3.5.1"
+        "vue-router": "^3.5.1",
+        "vue-the-mask": "^0.11.1"
     }
 }
