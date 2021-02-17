@@ -15,7 +15,7 @@ class EstabelecimentoController extends Controller
     public function index()
     {
         $estabelecimentos = Estabelecimento::all()->toArray();
-        return array_reverse($estabelecimentos);
+        return $estabelecimentos;
     }
 
     /**
@@ -36,22 +36,26 @@ class EstabelecimentoController extends Controller
      */
     public function store(Request $request)
     {
+        if(!$request->input('razao_social')){
+            return response()->json(['success' => 0, 'message' => 'razao_social']);
+        }
         $estabelecimento = new Estabelecimento([
             'nome' => $request->input('nome'),
             'email' => $request->input('email'),
             'celular' => $request->input('celular'),
             'endereco' => $request->input('endereco'),
             'numero' => $request->input('numero'),
+            'complemento' => $request->input('complemento'),
             'cep' => $request->input('cep'),
             'coords_xy' => $request->input('coords_xy'),
             'sql' => $request->input('sql'),
             'razao_social' => $request->input('razao_social'),
-            'cnpj' => $request->input('nome'),
+            'cnpj' => $request->input('cnpj'),
             'licenca_funcionamento' => $request->input('licenca_funcionamento'),
         ]);
         $estabelecimento->save();
 
-        return response()->json('Estabelecimento cadastrado com sucesso.');
+        return response()->json(['success' => 1, 'message' => 'Salvo com sucesso!']);
     }
 
     /**

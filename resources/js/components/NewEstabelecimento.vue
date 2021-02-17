@@ -18,9 +18,9 @@
                             <div class="invalid-feedback">{{ valErrors.razao_social }}</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="licenca" class="form-label">Licença de funcionamento</label>
-                            <input type="text" class="form-control" id="licenca" v-model="estabelecimento.licenca" required />
-                            <div class="invalid-feedback">{{ valErrors.licenca }}</div>
+                            <label for="licenca_funcionamento" class="form-label">Licença de funcionamento</label>
+                            <input type="text" class="form-control" id="licenca_funcionamento" v-model="estabelecimento.licenca_funcionamento" required />
+                            <div class="invalid-feedback">{{ valErrors.licenca_funcionamento }}</div>
                         </div>
                     </div>
                     <br>
@@ -80,6 +80,19 @@
             </div>
             <center><button class="btn btn-lg btn-primary" type="submit" @click="checkForm($event)">Enviar</button></center>
         </form>
+
+        <!-- Modal sucesso -->
+        <div id="modal-sucesso" @click="redirectSite" v-if="modalSucesso">
+            <div class="card">
+                <div class="card-header">
+                    Dados enviados
+                </div>
+                <div class="card-body">
+                    <center><p>As informações foram enviadas com sucesso!</p></center>
+                    <center><button class="btn btn-success btn-lg">Sair</button></center>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -100,11 +113,12 @@ export default {
                 razao_social: 'Preencha a razão social.',
                 cep: 'CEP inválido',
                 cnpj: 'CNPJ inválido.',
-                licenca: 'Por favor, preencha a licença de funcionamento.'
+                licenca_funcionamento: 'Por favor, preencha a licença de funcionamento.'
             },
             cep_api: 'api/cep/',
             cnpj_api: 'api/cnpj/',
-            waitingCep : false
+            waitingCep : false,
+            modalSucesso: false
         }
     },
     components: {
@@ -121,23 +135,36 @@ export default {
                     e.preventDefault()
                     e.stopPropagation()
                 }
+                else
+                    this.sendForm()
                 form.classList.add('was-validated')
             }, false)
                 
-            if(!this.errors.length)
-                this.sendForm()
-            else
-                document.querySelector('#formulario').focus()
+            document.querySelector('#formulario').focus()
 
         },
         sendForm: function() {
             // Prepara objeto Estabelecimento e envia para o servidor
             axios.post('api/estabelecimento/store', this.estabelecimento)
             .then(response => {
-                console.log(response.data)
-                console.warn(response)
+                if(response.data.success === 1) {
+                    this.showModal("Sucesso")
+                }
+                else if(response.data.success === 0) {
+                    if (response.data.message === 'razao_social'){
+                        document.querySelector('#razao_social').removeAttribute('disabled')
+                        document.querySelector('#razao_social').classList.add('is-invalid')
+                        document.querySelector('#razao_social').focus()
+                    }
+                }
+                
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                if(err.data === 'razao_social'){
+                    document.querySelector('#razao_social').removeAttribute('disabled')
+                }
+                console.error(err)
+            })
         },
         valEmail: function() {
             // Valida e-mail 
@@ -211,7 +238,7 @@ export default {
                     Vue.set(this.estabelecimento, 'email', response.data.email)
                     this.getCepAddress()
                     Vue.set(this.estabelecimento, 'numero', response.data.numero)
-                    document.querySelector('#licenca').focus()
+                    document.querySelector('#licenca_funcionamento').focus()
                     
                 })
                 .catch(err => {
@@ -220,6 +247,15 @@ export default {
                     document.querySelector('#razao_social').removeAttribute('disabled')
                 })
             }
+        },
+        showModal: function(tipo){
+            if(tipo === "Sucesso"){
+                // document.querySelector('#modal-sucesso')
+                this.modalSucesso = true
+            }
+        },
+        redirectSite: function() {
+            window.location.href = 'https://www.prefeitura.sp.gov.br/cidade/secretarias/licenciamento/'
         }
     }
 }

@@ -2072,6 +2072,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -2088,11 +2101,12 @@ __webpack_require__.r(__webpack_exports__);
         razao_social: 'Preencha a razão social.',
         cep: 'CEP inválido',
         cnpj: 'CNPJ inválido.',
-        licenca: 'Por favor, preencha a licença de funcionamento.'
+        licenca_funcionamento: 'Por favor, preencha a licença de funcionamento.'
       },
       cep_api: 'api/cep/',
       cnpj_api: 'api/cnpj/',
-      waitingCep: false
+      waitingCep: false,
+      modalSucesso: false
     };
   },
   components: {
@@ -2100,6 +2114,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     checkForm: function checkForm(e) {
+      var _this = this;
+
       if (e) {
         e.preventDefault();
       }
@@ -2109,19 +2125,32 @@ __webpack_require__.r(__webpack_exports__);
         if (!form.checkValidity()) {
           e.preventDefault();
           e.stopPropagation();
-        }
+        } else _this.sendForm();
 
         form.classList.add('was-validated');
       }, false);
-      if (!this.errors.length) this.sendForm();else document.querySelector('#formulario').focus();
+      document.querySelector('#formulario').focus();
     },
     sendForm: function sendForm() {
+      var _this2 = this;
+
       // Prepara objeto Estabelecimento e envia para o servidor
       axios.post('api/estabelecimento/store', this.estabelecimento).then(function (response) {
-        console.log(response.data);
-        console.warn(response);
+        if (response.data.success === 1) {
+          _this2.showModal("Sucesso");
+        } else if (response.data.success === 0) {
+          if (response.data.message === 'razao_social') {
+            document.querySelector('#razao_social').removeAttribute('disabled');
+            document.querySelector('#razao_social').classList.add('is-invalid');
+            document.querySelector('#razao_social').focus();
+          }
+        }
       })["catch"](function (err) {
-        return console.error(err);
+        if (err.data === 'razao_social') {
+          document.querySelector('#razao_social').removeAttribute('disabled');
+        }
+
+        console.error(err);
       });
     },
     valEmail: function valEmail() {
@@ -2145,19 +2174,19 @@ __webpack_require__.r(__webpack_exports__);
       mailConfirmField.classList.add('is-valid');
     },
     getCepAddress: function getCepAddress() {
-      var _this = this;
+      var _this3 = this;
 
       var cepUrl = this.cep_api + this.cleanNumber(this.estabelecimento.cep);
       this.waitingCep = true;
       window.setTimeout(function () {
-        if (_this.waitingCep) {
+        if (_this3.waitingCep) {
           document.querySelector('#cep').classList.remove('is-invalid');
           document.querySelector('#endereco').removeAttribute('disabled');
           console.log("Falha ao obter dados do CEP");
         } else console.log("Cep obtido");
       }, 3000);
       axios.get(cepUrl).then(function (response) {
-        _this.waitingCep = false;
+        _this3.waitingCep = false;
 
         if (response.data.erro) {
           document.querySelector('#cep').classList.add('is-invalid');
@@ -2166,7 +2195,7 @@ __webpack_require__.r(__webpack_exports__);
 
         var endereco = response.data.logradouro + " - " + response.data.bairro;
         document.querySelector('#cep').classList.remove('is-invalid');
-        Vue.set(_this.estabelecimento, 'endereco', endereco);
+        Vue.set(_this3.estabelecimento, 'endereco', endereco);
       })["catch"](function (err) {
         return document.querySelector('#endereco').removeAttribute('disabled');
       });
@@ -2178,7 +2207,7 @@ __webpack_require__.r(__webpack_exports__);
       return clean;
     },
     checkCnpj: function checkCnpj() {
-      var _this2 = this;
+      var _this4 = this;
 
       if (this.estabelecimento.cnpj && this.estabelecimento.cnpj.length === 18) {
         var cnpjUrl = this.cnpj_api + this.cleanNumber(this.estabelecimento.cnpj);
@@ -2190,20 +2219,29 @@ __webpack_require__.r(__webpack_exports__);
           } // Atualiza CEP e busca endereço a partir dele
 
 
-          Vue.set(_this2.estabelecimento, 'cep', response.data.cep);
-          Vue.set(_this2.estabelecimento, 'razao_social', response.data.nome);
-          Vue.set(_this2.estabelecimento, 'email', response.data.email);
+          Vue.set(_this4.estabelecimento, 'cep', response.data.cep);
+          Vue.set(_this4.estabelecimento, 'razao_social', response.data.nome);
+          Vue.set(_this4.estabelecimento, 'email', response.data.email);
 
-          _this2.getCepAddress();
+          _this4.getCepAddress();
 
-          Vue.set(_this2.estabelecimento, 'numero', response.data.numero);
-          document.querySelector('#licenca').focus();
+          Vue.set(_this4.estabelecimento, 'numero', response.data.numero);
+          document.querySelector('#licenca_funcionamento').focus();
         })["catch"](function (err) {
           console.error("Não foi possível consultar CNPJ");
           document.querySelector('#cnpj').classList.remove('is-invalid');
           document.querySelector('#razao_social').removeAttribute('disabled');
         });
       }
+    },
+    showModal: function showModal(tipo) {
+      if (tipo === "Sucesso") {
+        // document.querySelector('#modal-sucesso')
+        this.modalSucesso = true;
+      }
+    },
+    redirectSite: function redirectSite() {
+      window.location.href = 'https://www.prefeitura.sp.gov.br/cidade/secretarias/licenciamento/';
     }
   }
 });
@@ -37985,6 +38023,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "row" }, [
       _c("img", {
+        staticClass: "ml-2",
         attrs: {
           src: "/img/smul_logo_azul.png",
           alt: "SMUL",
@@ -38299,7 +38338,10 @@ var render = function() {
               _c("div", { staticClass: "col-md-4" }, [
                 _c(
                   "label",
-                  { staticClass: "form-label", attrs: { for: "licenca" } },
+                  {
+                    staticClass: "form-label",
+                    attrs: { for: "licenca_funcionamento" }
+                  },
                   [_vm._v("Licença de funcionamento")]
                 ),
                 _vm._v(" "),
@@ -38308,13 +38350,19 @@ var render = function() {
                     {
                       name: "model",
                       rawName: "v-model",
-                      value: _vm.estabelecimento.licenca,
-                      expression: "estabelecimento.licenca"
+                      value: _vm.estabelecimento.licenca_funcionamento,
+                      expression: "estabelecimento.licenca_funcionamento"
                     }
                   ],
                   staticClass: "form-control",
-                  attrs: { type: "text", id: "licenca", required: "" },
-                  domProps: { value: _vm.estabelecimento.licenca },
+                  attrs: {
+                    type: "text",
+                    id: "licenca_funcionamento",
+                    required: ""
+                  },
+                  domProps: {
+                    value: _vm.estabelecimento.licenca_funcionamento
+                  },
                   on: {
                     input: function($event) {
                       if ($event.target.composing) {
@@ -38322,7 +38370,7 @@ var render = function() {
                       }
                       _vm.$set(
                         _vm.estabelecimento,
-                        "licenca",
+                        "licenca_funcionamento",
                         $event.target.value
                       )
                     }
@@ -38330,7 +38378,7 @@ var render = function() {
                 }),
                 _vm._v(" "),
                 _c("div", { staticClass: "invalid-feedback" }, [
-                  _vm._v(_vm._s(_vm.valErrors.licenca))
+                  _vm._v(_vm._s(_vm.valErrors.licenca_funcionamento))
                 ])
               ])
             ]),
@@ -38728,7 +38776,40 @@ var render = function() {
         ])
       ],
       1
-    )
+    ),
+    _vm._v(" "),
+    _vm.modalSucesso
+      ? _c(
+          "div",
+          { attrs: { id: "modal-sucesso" }, on: { click: _vm.redirectSite } },
+          [
+            _c("div", { staticClass: "card" }, [
+              _c("div", { staticClass: "card-header" }, [
+                _vm._v("\n                Dados enviados\n            ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "card-body" },
+                [
+                  _c("center", [
+                    _c("p", [
+                      _vm._v("As informações foram enviadas com sucesso!")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("center", [
+                    _c("button", { staticClass: "btn btn-success btn-lg" }, [
+                      _vm._v("Sair")
+                    ])
+                  ])
+                ],
+                1
+              )
+            ])
+          ]
+        )
+      : _vm._e()
   ])
 }
 var staticRenderFns = []

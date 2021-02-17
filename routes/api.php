@@ -19,7 +19,8 @@ Route::get('/cnpj/{cnpj}', function ($cnpj){
     return response()->json(json_decode(file_get_contents($cnpj)));
 });
 
-Route::get('estabelecimentos', [EstabelecimentoController::class, 'index']);
+// Route::get('estabelecimentos', [EstabelecimentoController::class, 'index']);
+
 Route::group(['prefix' => 'estabelecimento'], function() {
-    Route::post('store', 'EstabelecimentoController@store');
+    Route::post('store', [EstabelecimentoController::class, 'store']);
 });
