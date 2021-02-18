@@ -14,4 +14,5 @@ yarn-error.log
 analyticstracking.php
 package-lock.json
 composer.lock
-public/js/app.js*
+public/js/app.js
+public/js/app.js.LICENSE.txt
