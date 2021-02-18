@@ -7,7 +7,7 @@ form button {
     min-width: 25%;
 }
 
-#modal-sucesso {
+.modal-custom {
     position: fixed;
     display: block;
     width: 100%;

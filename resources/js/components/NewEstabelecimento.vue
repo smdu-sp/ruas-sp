@@ -82,7 +82,7 @@
         </form>
 
         <!-- Modal sucesso -->
-        <div id="modal-sucesso" @click="redirectSite" v-if="modalSucesso">
+        <div id="modal-sucesso" class="modal-custom" @click="redirectSite" v-if="modalSucesso">
             <div class="card">
                 <div class="card-header">
                     Dados enviados
@@ -90,6 +90,17 @@
                 <div class="card-body">
                     <center><p>As informações foram enviadas com sucesso!</p></center>
                     <center><button class="btn btn-success btn-lg">Sair</button></center>
+                </div>
+            </div>
+        </div>
+        <div id="modal-erro" class="modal-custom" @click="modalErro = false" v-if="modalErro">
+            <div class="card">
+                <div class="card-header">
+                    Falha no envio
+                </div>
+                <div class="card-body">
+                    <center><p>{{errorMsg}}</p></center>
+                    <center><button class="btn btn-danger btn-lg">OK</button></center>
                 </div>
             </div>
         </div>
@@ -118,7 +129,9 @@ export default {
             cep_api: 'api/cep/',
             cnpj_api: 'api/cnpj/',
             waitingCep : false,
-            modalSucesso: false
+            modalSucesso: false,
+            modalErro: false,
+            errorMsg: ''
         }
     },
     components: {
@@ -155,6 +168,12 @@ export default {
                         document.querySelector('#razao_social').removeAttribute('disabled')
                         document.querySelector('#razao_social').classList.add('is-invalid')
                         document.querySelector('#razao_social').focus()
+                        return
+                    }
+                    if (response.data.message === 'cnpj_ja_cadastrado'){
+                        this.errorMsg = "Estabelecimento já cadastrado!"
+                        this.showModal("Erro")
+                        return
                     }
                 }
                 
@@ -163,7 +182,6 @@ export default {
                 if(err.data === 'razao_social'){
                     document.querySelector('#razao_social').removeAttribute('disabled')
                 }
-                console.error(err)
             })
         },
         valEmail: function() {
@@ -192,10 +210,9 @@ export default {
                 if(this.waitingCep) {
                     document.querySelector('#cep').classList.remove('is-invalid')
                     document.querySelector('#endereco').removeAttribute('disabled')
-                    console.log("Falha ao obter dados do CEP")
                 }
-                else
-                    console.log("Cep obtido")
+                // else
+                //     console.log("Cep obtido")
             }, 3000)
             
             axios.
@@ -229,7 +246,7 @@ export default {
                 .then(response => {
                     if(response.data.status === "ERROR") {
                         document.querySelector('#cnpj').classList.add('is-invalid')
-                        console.log(response.data.message)
+                        // console.log(response.data.message)
                         return
                     }
                     // Atualiza CEP e busca endereço a partir dele
@@ -242,7 +259,7 @@ export default {
                     
                 })
                 .catch(err => {
-                    console.error("Não foi possível consultar CNPJ")
+                    // console.error("Não foi possível consultar CNPJ")
                     document.querySelector('#cnpj').classList.remove('is-invalid')
                     document.querySelector('#razao_social').removeAttribute('disabled')
                 })
@@ -250,8 +267,12 @@ export default {
         },
         showModal: function(tipo){
             if(tipo === "Sucesso"){
-                // document.querySelector('#modal-sucesso')
                 this.modalSucesso = true
+                return
+            }
+            if(tipo === "Erro"){
+                this.modalErro = true
+                return
             }
         },
         redirectSite: function() {

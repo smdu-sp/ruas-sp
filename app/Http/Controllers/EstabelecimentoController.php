@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Estabelecimento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EstabelecimentoController extends Controller
 {
@@ -39,6 +40,11 @@ class EstabelecimentoController extends Controller
         if(!$request->input('razao_social')){
             return response()->json(['success' => 0, 'message' => 'razao_social']);
         }
+
+        $exists = DB::table('estabelecimentos')->where('cnpj', $request->input('cnpj'))->first();
+        if($exists)
+            return response()->json(['success' => 0, 'message' => 'cnpj_ja_cadastrado']);
+
         $estabelecimento = new Estabelecimento([
             'nome' => $request->input('nome'),
             'email' => $request->input('email'),
@@ -53,6 +59,7 @@ class EstabelecimentoController extends Controller
             'cnpj' => $request->input('cnpj'),
             'licenca_funcionamento' => $request->input('licenca_funcionamento'),
         ]);
+        
         $estabelecimento->save();
 
         return response()->json(['success' => 1, 'message' => 'Salvo com sucesso!']);
