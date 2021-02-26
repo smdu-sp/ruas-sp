@@ -1,3 +1,8 @@
+body {
+    background-color: black !important;
+    color: aliceblue !important;
+}
+
 h1 {
     padding: 1em 0.4em;
 }
@@ -5,6 +10,62 @@ h1 {
 form button {
     margin: 30px 0 !important;
     min-width: 25%;
+}
+
+div.card {
+    background-color: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+div.card-header, input.form-control {
+    background-color: #222222;
+    color: whitesmoke;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+input.form-control:disabled {
+    background-color: #3a3a3a;
+}
+
+#link-bt-container {
+    width: 100%;
+    display: flex;
+    margin: 3em 1em;
+}
+
+.btn.btn-primary {
+    background-color: #9d1460;
+    border: none;
+    text-transform: uppercase;
+}
+
+.btn.btn-primary:hover {
+    background-color: #aa467d;
+}
+
+.btn.btn-primary:focus {
+    background-color: #9d1460;
+    border: none;
+}
+
+.btn.btn-secondary {
+    background-color: #ea5b27;
+    border-radius: 2em;
+    padding: 1em 2em;
+    font-weight: bold;
+    border: none;
+}
+
+.btn.btn-secondary:hover {
+    background-color: #e97c55;
+}
+
+.link-bt a {
+    color: white;
+}
+
+.link-bt a:hover {
+    color: whitesmoke;
 }
 
 .modal-custom {
@@ -15,5 +76,15 @@ form button {
     top: 0;
     left: 0;
     padding: 20%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(255,255,255,0.3);
+}
+
+button.btn {
+    border-radius: 2em;
+    padding: 1em 2em;
+}
+
+.modal-custom .btn {
+    border-radius: 0.3em;
+    padding: 0.5em 1em;
 }
