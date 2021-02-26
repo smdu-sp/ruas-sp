@@ -1866,9 +1866,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2231,9 +2228,7 @@ __webpack_require__.r(__webpack_exports__);
         if (_this3.waitingCep) {
           document.querySelector('#cep').classList.remove('is-invalid');
           document.querySelector('#endereco').removeAttribute('disabled');
-        } // else
-        //     console.log("Cep obtido")
-
+        }
       }, 3000);
       axios.get(cepUrl).then(function (response) {
         _this3.waitingCep = false;
@@ -2263,8 +2258,7 @@ __webpack_require__.r(__webpack_exports__);
         var cnpjUrl = this.cnpj_api + this.cleanNumber(this.estabelecimento.cnpj);
         axios.get(cnpjUrl).then(function (response) {
           if (response.data.status === "ERROR") {
-            document.querySelector('#cnpj').classList.add('is-invalid'); // console.log(response.data.message)
-
+            document.querySelector('#cnpj').classList.add('is-invalid');
             return;
           } // Atualiza CEP e busca endereço a partir dele
 
@@ -2278,7 +2272,6 @@ __webpack_require__.r(__webpack_exports__);
           Vue.set(_this4.estabelecimento, 'numero', response.data.numero);
           document.querySelector('#licenca_funcionamento').focus();
         })["catch"](function (err) {
-          // console.error("Não foi possível consultar CNPJ")
           document.querySelector('#cnpj').classList.remove('is-invalid');
           document.querySelector('#razao_social').removeAttribute('disabled');
         });
@@ -38076,18 +38069,20 @@ var render = function() {
         _c(
           "div",
           { attrs: { id: "link-bt-container" } },
-          _vm._l(_vm.links, function(link) {
-            return _c(
-              "div",
-              { key: link.url, staticClass: "col-4 text-center" },
-              [
-                _c("a", { attrs: { href: link.url, target: "_blank" } }, [
+          _vm._l(_vm.links, function(link, key) {
+            return _c("div", { key: key, staticClass: "col-4 text-center" }, [
+              _c(
+                "a",
+                {
+                  attrs: { href: link.url, rel: "noreferrer", target: "_blank" }
+                },
+                [
                   _c("button", { staticClass: "btn btn-secondary" }, [
                     _vm._v(_vm._s(link.nome))
                   ])
-                ])
-              ]
-            )
+                ]
+              )
+            ])
           }),
           0
         )
@@ -38104,14 +38099,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-6" }, [
-      _c("img", {
-        attrs: {
-          src: "/img/logo_ruassp.png",
-          alt: "Ruas SP",
-          width: "248",
-          height: "176"
-        }
-      })
+      _c("img", { attrs: { src: "/img/logo_ruassp.png", alt: "Ruas SP" } })
     ])
   },
   function() {
@@ -38119,10 +38107,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-6 text-right" }, [
-      _c("img", {
-        staticClass: "mt-3",
-        attrs: { src: "/img/logo_smul.png", alt: "SMUL" }
-      })
+      _c("img", { attrs: { src: "/img/logo_smul.png", alt: "SMUL" } })
     ])
   }
 ]

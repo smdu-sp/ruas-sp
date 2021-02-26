@@ -88,3 +88,16 @@ button.btn {
     border-radius: 0.3em;
     padding: 0.5em 1em;
 }
+
+@media only screen and (max-width: 767px) {
+    #link-bt-container {
+        display: block;
+    }
+    #link-bt-container div.col-4 {
+        max-width: 100%;
+        margin: 1em 0;
+    }
+    #link-bt-container button {
+        width: 100%;
+    }
+}
