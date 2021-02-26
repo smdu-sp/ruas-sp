@@ -211,8 +211,6 @@ export default {
                     document.querySelector('#cep').classList.remove('is-invalid')
                     document.querySelector('#endereco').removeAttribute('disabled')
                 }
-                // else
-                //     console.log("Cep obtido")
             }, 3000)
             
             axios.
@@ -246,7 +244,6 @@ export default {
                 .then(response => {
                     if(response.data.status === "ERROR") {
                         document.querySelector('#cnpj').classList.add('is-invalid')
-                        // console.log(response.data.message)
                         return
                     }
                     // Atualiza CEP e busca endereço a partir dele
@@ -259,7 +256,6 @@ export default {
                     
                 })
                 .catch(err => {
-                    // console.error("Não foi possível consultar CNPJ")
                     document.querySelector('#cnpj').classList.remove('is-invalid')
                     document.querySelector('#razao_social').removeAttribute('disabled')
                 })

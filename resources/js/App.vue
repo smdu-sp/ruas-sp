@@ -2,17 +2,14 @@
     <div class="container">
         <div id="header" class="row">
             <div class="col-6">
-                <img src="/img/logo_ruassp.png" alt="Ruas SP" width="248" height="176">
+                <img src="/img/logo_ruassp.png" alt="Ruas SP">
             </div>
             <div class="col-6 text-right">
-                <img src="/img/logo_smul.png" class="mt-3" alt="SMUL">
+                <img src="/img/logo_smul.png" alt="SMUL">
             </div>
             <div id="link-bt-container">
-                <div class="col-4 text-center" v-for="link in links" v-bind:key="link.url">
-                    <!-- <div class="link-bt text-center">
-                        <a :href="link.url" target="_blank">{{link.nome}}</a>
-                    </div> -->
-                    <a :href="link.url" target="_blank"><button class="btn btn-secondary">{{ link.nome }}</button></a>
+                <div class="col-4 text-center" v-for="(link, key) in links" v-bind:key="key">
+                    <a :href="link.url" rel="noreferrer" target="_blank"><button class="btn btn-secondary">{{ link.nome }}</button></a>
                 </div>
             </div>
             
