@@ -12,8 +12,6 @@
                     <a :href="link.url" rel="noreferrer" target="_blank"><button class="btn btn-secondary">{{ link.nome }}</button></a>
                 </div>
             </div>
-            
-            <!-- <h1 style="line-height: 3">Projeto Ruas SP</h1> -->
         </div>
         <router-view></router-view>
     </div>

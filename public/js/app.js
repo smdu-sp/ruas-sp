@@ -1864,8 +1864,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2325,8 +2323,7 @@ Vue.use((vue_the_mask__WEBPACK_IMPORTED_MODULE_2___default()));
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__.default({
   mode: 'history',
   routes: _routes__WEBPACK_IMPORTED_MODULE_3__.routes
-}); // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-
+});
 var app = new Vue({
   el: '#app',
   router: router,
