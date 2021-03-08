@@ -16,3 +16,5 @@ package-lock.json
 composer.lock
 public/js/app.js
 public/js/app.js.LICENSE.txt
+cypress.env.json
+cypress/integration/examples
