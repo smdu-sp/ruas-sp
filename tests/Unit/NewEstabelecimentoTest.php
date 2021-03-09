@@ -4,9 +4,12 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Models\Estabelecimento;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class NewEstabelecimentoTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function makes_new_estabelecimento_object()
     {
@@ -32,7 +35,6 @@ class NewEstabelecimentoTest extends TestCase
 
         $extraColumns = array_diff($estabelecimento->getFillable(), $expectedColumns);
 
-        // Act
         // Assert
         $this->assertEquals(0, count($missingColumns));
         $this->assertEquals(0, count($extraColumns));
