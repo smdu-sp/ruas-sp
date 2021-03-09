@@ -1,0 +1,45 @@
+{
+    "atividade_principal": [
+        {
+            "text": "Administra\u00e7\u00e3o p\u00fablica em geral",
+            "code": "84.11-6-00"
+        }
+    ],
+    "data_situacao": "03\/11\/2005",
+    "complemento": "EDIF MATARAZZO",
+    "tipo": "MATRIZ",
+    "nome": "MUNICIPIO DE SAO PAULO",
+    "efr": "MUNIC\u00cdPIO DE SAO PAULO",
+    "uf": "SP",
+    "telefone": "(11) 3113-8438\/ (11) 3113-8437",
+    "email": "trrs@prefeitura.sp.gov.br",
+    "situacao": "ATIVA",
+    "bairro": "CENTRO",
+    "logradouro": "VD DO CHA",
+    "numero": "1500",
+    "cep": "01.002-020",
+    "municipio": "SAO PAULO",
+    "porte": "DEMAIS",
+    "abertura": "12\/12\/1974",
+    "natureza_juridica": "124-4 - Munic\u00edpio",
+    "fantasia": "SECRETARIA DO GOVERNO MUNICIPAL",
+    "cnpj": "46.395.000\/0001-39",
+    "ultima_atualizacao": "2021-03-08T12:59:08.453Z",
+    "status": "OK",
+    "motivo_situacao": "",
+    "situacao_especial": "",
+    "data_situacao_especial": "",
+    "atividades_secundarias": [
+        {
+            "code": "00.00-0-00",
+            "text": "N\u00e3o informada"
+        }
+    ],
+    "capital_social": "0.00",
+    "qsa": [],
+    "extra": {},
+    "billing": {
+        "free": true,
+        "database": true
+    }
+}

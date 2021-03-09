@@ -53,7 +53,7 @@ class EstabelecimentoController extends Controller
             'numero' => $request->input('numero'),
             'complemento' => $request->input('complemento'),
             'cep' => $request->input('cep'),
-            'coords_xy' => $request->input('coords_xy'),
+            'coords_xy' => $request->input('coords_xy', false),
             'sql' => $request->input('sql'),
             'razao_social' => $request->input('razao_social'),
             'cnpj' => $request->input('cnpj'),

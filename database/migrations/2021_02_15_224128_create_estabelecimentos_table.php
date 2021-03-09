@@ -23,8 +23,8 @@ class CreateEstabelecimentosTable extends Migration
             $table->string('numero');
             $table->string('complemento');
             $table->string('cep');
-            $table->string('coords_xy');
-            $table->string('sql');
+            $table->string('coords_xy')->nullable();
+            $table->string('sql')->nullable();
 
             $table->string('razao_social');
             $table->string('cnpj');
