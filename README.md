@@ -1,10 +1,13 @@
-## Projeto Ruas SP
+# Projeto Ruas SP
+![Screenshot - Logo Ruas SP](./public/img/logo_ruassp.png?raw=true)
 
-<p>Página de pré-cadastro de bares e restaurantes que participarão do projeto Ruas SP</p>
 
-<hr>
+Página de pré-cadastro de bares e restaurantes que participarão do projeto Ruas SP.
 
-### Instalação / Setup
+---
+
+## Instalação / Setup
+
 1. Clone o repositório
 
 ```
@@ -45,11 +48,22 @@ Pronto! Para executar a aplicação no servidor local (desenvolvimento), execute
 php artisan serve
 npm run watch
 ```
+---
+## Testes
+
+### Testes unitários e de integração
+```
+php artisan test
+```
+
+### Testes e2e
+```
+npm run test
+```
 
 
 
 
-<hr>
+![Screenshot - Logo da Secretaria Municipal de Urbanismo e Licenciamento da Cidade de São Paulo](./public/img/logo_smul.png?raw=true)
+
 SMUL - Secretaria Municipal de Urbanismo e Licenciamento
-<br>
-Prefeitura de São Paulo
