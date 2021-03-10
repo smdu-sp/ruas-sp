@@ -1,7 +1,5 @@
 # Projeto Ruas SP
-<div style="background-color: #202030; padding: 5px; margin: 20px 0px;">
-<img src="./public/img/logo_ruassp.png?raw=true">
-</div>
+<img src="./public/img/banner_ruassp.png?raw=true">
 
 Página de pré-cadastro de bares e restaurantes que participarão do projeto Ruas SP.
 
