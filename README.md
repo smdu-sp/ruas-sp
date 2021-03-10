@@ -1,6 +1,7 @@
 # Projeto Ruas SP
-![Screenshot - Logo Ruas SP](./public/img/logo_ruassp.png?raw=true)
-
+<div style="background-color: #202030; padding: 5px; margin: 20px 0px;">
+<img src="./public/img/logo_ruassp.png?raw=true">
+</div>
 
 Página de pré-cadastro de bares e restaurantes que participarão do projeto Ruas SP.
 
@@ -64,6 +65,5 @@ npm run test
 
 
 
-![Screenshot - Logo da Secretaria Municipal de Urbanismo e Licenciamento da Cidade de São Paulo](./public/img/logo_smul.png?raw=true)
-
-SMUL - Secretaria Municipal de Urbanismo e Licenciamento
+<img src="./public/img/logo_smul_preto.png?raw=true" width=250 title="SMUL - Secretaria Municipal de Urbanismo e Licenciamento">
+</div>
