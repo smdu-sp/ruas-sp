@@ -28,7 +28,7 @@
                     },
                     {
                         nome: 'CONFIRA AS VIAS APROVADAS',
-                        url: 'https://www.prefeitura.sp.gov.br/cidade/secretarias/licenciamento/servicos/index.php?p=308717'
+                        url: 'https://www.prefeitura.sp.gov.br/cidade/secretarias/licenciamento/noticias/index.php?p=311393'
                     },
                     {
                         nome: 'MAIS INFORMAÇÕES',
