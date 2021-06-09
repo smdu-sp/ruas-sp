@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-        <h2>Cadastrar Estabelecimento</h2>
-        <p>Preencha os dados abaixo para realizar o pré-cadastro do seu estabelecimento:</p>
+        <h2>Cadastrar Rua</h2>
+        <p>Preencha abaixo os dados do estabelecimento para solicitar autorização para a rua</p>
         <form id="formulario" class="g-3 needs-validation" method="post" novalidate>
             <div class="card">
                 <div class="card-header">Informações do estabelecimento</div>
