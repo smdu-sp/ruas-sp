@@ -1,5 +1,5 @@
 import AllEstabelecimentos from './components/AllEstabelecimentos.vue';
-import NewEstabelecimento from './components/NewEstabelecimento.vue';
+import NewEstabelecimento from './components/Encerrado.vue';
 import Home from './components/Home.vue';
 
 export const routes = [
